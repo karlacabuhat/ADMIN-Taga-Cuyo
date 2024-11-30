@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -55,11 +55,11 @@
     </div>
 
     <script type="module">
-        // Import Firebase SDK functions
+        // Import the Firebase SDK functions
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
         import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
-        import { sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+
         // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyA_VoT0W3zD6u5GVEa24dLcMkt3DJtnqYg",
@@ -86,38 +86,17 @@
             const password = document.getElementById('password').value;
             const termsChecked = document.getElementById('terms').checked;
 
-            // Check if terms and conditions are accepted
+            // Check if the terms and conditions are accepted
             if (!termsChecked) {
                 alert("You must agree to the terms and conditions to continue.");
                 return;  // Stop form submission
             }
 
+            // Sign in with email and password
             signInWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
                     const user = userCredential.user;
 
-                    // Check if the email is verified
-                    if (!user.emailVerified) {
-                        // Send verification email
-                        user.sendEmailVerification()
-                            .then(() => {
-                                alert("Verification email sent! Please verify your email address.");
-                                // Log out user if they haven't verified their email
-                                signOut(auth)
-                                    .then(() => {
-                                        console.log("Logged out for email verification");
-                                    })
-                                    .catch((error) => {
-                                        console.error("Error during logout:", error.message);
-                                    });
-                            })
-                            .catch((error) => {
-                                alert("Error sending verification email: " + error.message);
-                            });
-                        return; // Stop the login process
-                    }
-
-                    // Continue with other login procedures if email is verified
                     const dt = new Date();
 
                     // Update last login time in the Realtime Database
@@ -131,43 +110,42 @@
 
                     alert('User Logged In!');
                     // Redirect to dashboard after successful login
-                    window.location.href = 'dashboard.html';
+                    window.location.href = 'dashboard.html'; // Uncomment if needed
                 })
                 .catch((error) => {
                     const errorCode = error.code;
                     const errorMessage = error.message;
                     alert('Error: ' + errorMessage); // Display the error message
                 });
-
-            // Forgot Password
-            document.getElementById('forgotPassword').addEventListener('click', (e) => {
-                e.preventDefault();
-
-                const email = document.getElementById('email').value.trim();
-
-                if (!email) {
-                    alert("Please enter your email address to reset your password.");
-                    return;
-                }
-
-                sendPasswordResetEmail(auth, email)
-                    .then(() => {
-                        alert("Password reset email sent! Check your inbox or spam folder.");
-                    })
-                    .catch((error) => {
-                        const errorCode = error.code;
-                        const errorMessage = error.message;
-
-                        if (errorCode === 'auth/user-not-found') {
-                            alert("No user found with this email address.");
-                        } else if (errorCode === 'auth/invalid-email') {
-                            alert("Invalid email address. Please enter a valid email.");
-                        } else {
-                            alert('Error: ' + errorMessage);
-                        }
-                    });
-            });
         });
+        document.getElementById('forgotPassword').addEventListener('click', (e) => {
+    e.preventDefault(); // Prevent default anchor behavior
+
+    const email = document.getElementById('email').value.trim(); // Trim to remove spaces
+
+    if (!email) {
+        alert("Please enter your email address to reset your password.");
+        return;
+    }
+
+    sendPasswordResetEmail(auth, email)
+        .then(() => {
+            alert("Password reset email sent! Check your inbox or spam folder.");
+        })
+        .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+
+            if (errorCode === 'auth/user-not-found') {
+                alert("No user found with this email address.");
+            } else if (errorCode === 'auth/invalid-email') {
+                alert("Invalid email address. Please enter a valid email.");
+            } else {
+                alert('Error: ' + errorMessage);
+            }
+        });
+});
+
     </script>
 
     <style>
